@@ -34,10 +34,5 @@
     "mocha": "^10.2.0",
     "semantic-release": "^21.1.1",
     "spectron": "^19.0.0"
-  },
-  "release": {
-    "branches": [
-      "release" 
-      ] 
   }
 }
