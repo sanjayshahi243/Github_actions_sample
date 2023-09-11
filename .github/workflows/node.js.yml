@@ -34,18 +34,31 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      # ...
-      - name: "Build & test"
-        run: |
-          echo "done!"
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Install Node.js
+        uses: actions/setup-node@v2
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            LICENSE.txt
-            *.jar
-  
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Electron Forge globally
+        run: npm install -g @electron-forge/cli
+
+      - name: Build Electron App
+        run: npx electron-forge make
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
