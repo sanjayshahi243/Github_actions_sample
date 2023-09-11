@@ -47,11 +47,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Update version
-        run: |
-          $VERSION = Get-Date -Format "yyyyMMdd"
-          Write-Host "VERSION=$VERSION" >> $env:GITHUB_ENV
-        id: version
+      - name: Get tag name from ref
+        shell: bash
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+        id: get_tag
 
       - name: Install Electron Forge globally
         run: npm install -g @electron-forge/cli
@@ -65,8 +64,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.version.outputs.VERSION }}
-          release_name: Release ${{ steps.version.outputs.VERSION }}
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          release_name: Release ${{ steps.get_tag.outputs.tag }}
           automatic_release_tag: "latest"
           draft: false
           prerelease: false
