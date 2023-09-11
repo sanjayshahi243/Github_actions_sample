@@ -32,7 +32,11 @@ jobs:
   release:
     name: "Build and Release"
     runs-on: "windows-latest"
-
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -57,8 +61,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: latest
-          release_name: Release latest
           draft: false
           prerelease: false
-
+        run: npx semantic-release
