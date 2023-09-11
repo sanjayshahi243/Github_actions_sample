@@ -4,7 +4,7 @@
 name: Release
 
 on:
-  pull_request:
+  push:
     branches: [ "release" ]
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Electron Forge globally
         run: npm install -g @electron-forge/cli
