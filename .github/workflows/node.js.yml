@@ -49,9 +49,8 @@ jobs:
 
       - name: Update version
         run: |
-          # Use the current date as a version suffix (e.g., YYYYMMDD)
-          VERSION=$(date +'%Y%m%d')
-          echo "::set-output name=VERSION::$VERSION"
+          $VERSION = Get-Date -Format "yyyyMMdd"
+          Write-Host "VERSION=$VERSION" >> $env:GITHUB_ENV
         id: version
 
       - name: Install Electron Forge globally
