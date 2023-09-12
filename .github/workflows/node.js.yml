@@ -47,6 +47,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Update version
+        run: |
+          # Use the current date as a version suffix (e.g., YYYYMMDD)
+          VERSION=$(date +'%Y%m%d')
+          echo "::set-output name=VERSION::$VERSION"
+        id: version
+
       - name: Install Electron Forge globally
         run: npm install -g @electron-forge/cli
 
@@ -59,9 +66,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          automatic_release_tag: "latest"
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          release_name: Release ${{ steps.version.outputs.VERSION }}
+          # automatic_release_tag: "latest"
           draft: false
           prerelease: false
 
