@@ -12,7 +12,7 @@ const config = {
             'message': 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
         }],
         ["@semantic-release/github", {
-            'assets': ['package.json', 'out/*']
+            'assets': ['package.json', 'out/make']
         }]
     ]
   };
