@@ -33,7 +33,13 @@ jobs:
 
       - name: Build Electron App
         run: npx electron-forge make
-
+      
+      - name: Archive build
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: out
+          
       - name: Create GitHub Release
         id: create_release
         env:
