@@ -17,7 +17,7 @@ pipeline {
 
                     // Extract tag number from the commit message
                     def tagNumber = commitMessage =~ /Deploy: (\d+)/
-                    sh 'tagNumber: $tagNumber'
+                    sh 'echo tagNumber: $tagNumber'
                     if (tagNumber) {
                         tagNumber = tagNumber[0][1]
                         echo "Found deploy keyword with tag number: ${tagNumber}"
