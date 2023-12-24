@@ -43,13 +43,6 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
-            steps {
-                // Add your build and test steps here
-                // For example: sh 'npm install && npm test'
-            }
-        }
-
         stage('Create Tag') {
             when {
                 expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
