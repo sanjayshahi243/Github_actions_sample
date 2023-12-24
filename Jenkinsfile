@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    
+    environment {
+        TAG_NUMBER = ""
+    }
 
     stages {
         stage('Checkout') {
@@ -16,11 +20,11 @@ pipeline {
                     def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
 
                     // Extract tag number from the commit message
-                    def tagNumber = commitMessage =~ /Deploy: (\d+)/
-                    sh 'echo tagNumber: $tagNumber'
+                    def tagNumber = commitMessage =~ /Deploy: (\S+):/
                     if (tagNumber) {
                         tagNumber = tagNumber[0][1]
-                        echo "Found deploy keyword with tag number: ${tagNumber}"
+                        TAG_NUMBER = tagNumber
+                        echo "Found deploy keyword with tag number: ${TAG_NUMBER}"
                     } else {
                         error "No deploy keyword found in commit message. Aborting the build."
                     }
@@ -28,30 +32,33 @@ pipeline {
             }
         }
 
-        stage('Check Tag Existence') {
+        stage('Checkout and Create Tag') {
             steps {
                 script {
-                    // Check if the tag already exists
-                    def tagExists = sh(script: "git tag -l ${tagNumber}", returnStatus: true) == 0
+                    // Get the latest commit message
+                    def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
 
-                    if (tagExists) {
-                        error "Tag ${tagNumber} already exists. Aborting the build."
+                    // Extract tag number from the commit message
+                    def tagNumber = commitMessage =~ /Deploy: (\S+):/
+                    if (tagNumber) {
+                        tagNumber = tagNumber[0][1]
+                        TAG_NUMBER = tagNumber
+                        echo "Found deploy keyword with tag number: ${TAG_NUMBER}"
+
+                        // Check if the tag already exists
+                        def tagExists = sh(script: "git tag -l ${TAG_NUMBER}", returnStatus: true) == 0
+
+                        if (tagExists) {
+                            echo "Tag ${TAG_NUMBER} already exists. Skipping the tag creation."
+                        } else {
+                            // Create a new tag
+                            sh "git tag ${TAG_NUMBER}"
+                            sh 'git push --set-upstream origin ${TAG_NUMBER}'
+                            echo "Tag ${TAG_NUMBER} created and pushed."
+                        }
                     } else {
-                        echo "Tag ${tagNumber} does not exist. Proceeding with the build."
+                        error "No deploy keyword found in commit message. Aborting the build."
                     }
-                }
-            }
-        }
-
-        stage('Create Tag') {
-            when {
-                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
-            }
-            steps {
-                script {
-                    // Create a new tag
-                    sh "git tag ${tagNumber}"
-                    sh 'git push origin ${tagNumber}'
                 }
             }
         }
