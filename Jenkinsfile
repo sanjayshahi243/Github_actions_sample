@@ -16,7 +16,7 @@ pipeline {
                     def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
 
                     // Extract tag number from the commit message
-                    def tagNumber = commitMessage =~ /deploy: (\d+)/
+                    def tagNumber = commitMessage =~ /Deploy: (\d+)/
 
                     if (tagNumber) {
                         tagNumber = tagNumber[0][1]
